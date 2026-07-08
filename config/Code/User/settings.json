@@ -1,0 +1,9 @@
+{
+    "editor.fontFamily": "'JetBrainsMono Nerd Font', 'Fira Code', monospace",
+    "editor.fontLigatures": true,
+    "editor.fontSize": 14,
+    "editor.formatOnSave": true,
+    "files.autoSave": "afterDelay",
+    "terminal.integrated.defaultProfile.linux": "fish",
+    "terminal.integrated.fontFamily": "'JetBrainsMono Nerd Font'"
+}
