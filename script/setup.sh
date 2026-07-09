@@ -113,6 +113,7 @@ AUR_PACKAGES=(
     mongodb-compass
     xray-bin
     snapper snap-pac limine-snapper-sync
+    brrtfetch-git
 )
 $AUR -S --needed --noconfirm "${AUR_PACKAGES[@]}"
 

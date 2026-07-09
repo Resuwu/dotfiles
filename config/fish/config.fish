@@ -3,7 +3,7 @@ set -g fish_greeting
 
 # Автозапуск fastfetch при открытии новой интерактивной сессии
 if status is-interactive
-    fastfetch
+    ff
 end
 
 # --- Настройка темы bobthefish ---
@@ -19,3 +19,4 @@ alias ll="eza -lh --icons --grid --group-directories-first"
 alias la="eza -lah --icons --group-directories-first"
 alias cat="bat --style=plain"
 alias top="btop"
+alias ff="brrtfetch -width 60 -fps 20 -multiplier 10 -offset 3 /home/$USER/.config/brrtfetch/gifs/1.gif"
