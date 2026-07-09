@@ -64,69 +64,53 @@ git config --global alias.lg "log --graph --abbrev-commit --decorate --format=fo
 echo -e "${SUCCESS} Параметры и алиасы (st, co, br, lg) успешно добавлены в .gitconfig!"
 
 # ------------------------------------------------------------------------------
-# 2. СОЗДАНИЕ РЕЗЕРВНОЙ КОПИИ СТАРИХ КОНФИГОВ
+# 2. КОПИРОВАНИЕ КОНФИГУРАЦИОННЫХ ФАЙЛОВ
 # ------------------------------------------------------------------------------
-BACKUP_DIR="$HOME/.dotfiles_backup_$(date +%Y%m%d_%H%M%S)"
-echo -e "\n--- Подготовка файловой системы ---"
+echo -e "\n--- Копирование файлов в систему ---"
 
-# Функция для создания бэкапа и символической ссылки
-# Использование: link_file <источник_в_репо> <целевой_путь_в_системе>
-link_file() {
+# Функция для прямого копирования файла или папки с перезаписью
+# Использование: copy_file <источник_в_репо> <целевой_путь_в_системе>
+copy_file() {
     local src="$DOTFILES_DIR/$1"
     local dest="$HOME/$2"
     local dest_dir
     dest_dir="$(dirname "$dest")"
 
-    # Создаем целевую директорию, если её нет (например, ~/.config/fish)
+    # Создаем целевую директорию, если её еще нет в системе (например, ~/.config/fish)
     mkdir -p "$dest_dir"
 
-    # Если по целевому пути уже есть файл или директория (и это не наша ссылка) — бэкапим
-    if [ -e "$dest" ] && [ ! -L "$dest" ]; then
-        echo -e "${WARN} Найдена существующая конфигурация: $dest"
-        mkdir -p "$BACKUP_DIR/$(dirname "$2")"
-        mv "$dest" "$BACKUP_DIR/$2"
-        echo -e "${INFO} -> Перенесено в резервную копию: $BACKUP_DIR/$2"
-    # Если это старая ссылка — просто удаляем её
-    elif [ -L "$dest" ]; then
+    # Если в целевом пути случайно осталась старая символическая ссылка от прошлых опытов — удаляем её
+    if [ -L "$dest" ]; then
         rm "$dest"
     fi
 
-    # Создаем символическую ссылку
+    # Копируем файл или папку с перезаписью
     if [ -e "$src" ]; then
-        ln -sf "$src" "$dest"
-        echo -e "${SUCCESS} Ссылка создана: $dest -> $src"
+        cp -r "$src" "$dest"
+        echo -e "${SUCCESS} Скопировано: $src -> $dest"
     else
         echo -e "${WARN} Файл в репозитории не найден, пропускаем: $src"
     fi
 }
 
-# ------------------------------------------------------------------------------
-# 3. РАЗВЕРТЫВАНИЕ (СОЗДАНИЕ СИМЛИНКОВ)
-# ------------------------------------------------------------------------------
-echo -e "\n--- Линковка конфигурационных файлов ---"
-
-# Синтаксис: link_file "путь_от_корня_репо" "путь_от_домашней_папки"
+# Синтаксис: copy_file "путь_от_корня_репо" "путь_от_домашней_папки"
 
 # Оболочка и CLI утилиты
-link_file "config/fish/config.fish"  ".config/fish/config.fish"
-link_file "config/bat/config"        ".config/bat/config"
+copy_file "config/fish/config.fish"  ".config/fish/config.fish"
+copy_file "config/bat/config"        ".config/bat/config"
 
 # Настройки терминала Kitty
-link_file "config/kitty/kitty.conf" ".config/kitty/kitty.conf"
+copy_file "config/kitty/kitty.conf" ".config/kitty/kitty.conf"
 
 # Графический редактор VS Code
-link_file "config/Code/User/settings.json" ".config/Code/User/settings.json"
+copy_file "config/Code/User/settings.json" ".config/Code/User/settings.json"
 
 # Java/Kotlin инструмент сборки
-link_file "gradle/gradle.properties" ".gradle/gradle.properties"
+copy_file "gradle/gradle.properties" ".gradle/gradle.properties"
 
 # ------------------------------------------------------------------------------
-# 4. ЗАВЕРШЕНИЕ
+# 3. ЗАВЕРШЕНИЕ
 # ------------------------------------------------------------------------------
 echo -e "\n------------------------------------------------------------------------"
-echo -e "${SUCCESS} Развертывание Dotfiles успешно завершено!"
-if [ -d "$BACKUP_DIR" ]; then
-    echo -e "${INFO} Старые файлы настроек были сохранены в директорию:"
-    echo -e "  $BACKUP_DIR"
-fi
+echo -e "${SUCCESS} Развертывание Dotfiles успешно завершено! Все файлы скопированы."
 echo -e "------------------------------------------------------------------------"
