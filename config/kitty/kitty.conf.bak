@@ -1,0 +1,21 @@
+# --- Шрифты ---
+font_family      JetBrainsMono Nerd Font
+bold_font        auto
+italic_font      auto
+bold_italic_font auto
+font_size        12.0
+disable_ligatures never
+
+# --- Оболочка по умолчанию ---
+shell fish
+
+# --- Внешний вид и окно ---
+background_opacity 0.95
+window_padding_width 8
+confirm_os_window_close 0
+
+# --- Цветовая тема (например, Tokyo Night / Dark) ---
+foreground #c0caf5
+background #1a1b26
+selection_foreground #c0caf5
+selection_background #283457

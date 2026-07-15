@@ -18,8 +18,6 @@ sudo pacman -Syu --noconfirm
 
 # Проверяем наличие AUR-хелпера и устанавливаем paru при необходимости
 if command -v paru &> /dev/null; then
-    AUR=paru
-elif command -v yay &> /dev/null; then
     AUR=yay
 else
     echo -e "${INFO} AUR-хелпер не найден. Установка paru..."
@@ -66,10 +64,9 @@ sudo pacman -S --needed --noconfirm "${CLI_PACKAGES[@]}"
 # ------------------------------------------------------------------------------
 echo -e "${INFO} Установка графических приложений, LibreOffice, Krita, Inkscape и FileZilla..."
 GUI_PACKAGES=(
-    firefox mpv qbittorrent flameshot
+    firefox mpv qbittorrent
     dbeaver docker docker-compose flatpak
     openvpn networkmanager-openvpn
-    btrfs-assistant
     krita inkscape filezilla libreoffice-fresh
 )
 sudo pacman -S --needed --noconfirm "${GUI_PACKAGES[@]}"
@@ -105,58 +102,13 @@ done
 # ------------------------------------------------------------------------------
 echo -e "${INFO} Установка пакетов из AUR (IDE, Сети, БД, Snapper + Limine)..."
 AUR_PACKAGES=(
-    jetbrains-toolbox
+#    jetbrains-toolbox
     visual-studio-code-bin
-    amneziawg-tools
-    amneziawg-go
-    nekoray
-    mongodb-compass
-    xray-bin
-    snapper snap-pac limine-snapper-sync
+    amneziawg-tools-git
+    amneziawg-linux
     brrtfetch-git
 )
 $AUR -S --needed --noconfirm "${AUR_PACKAGES[@]}"
-
-# ------------------------------------------------------------------------------
-# 8. НАСТРОЙКА SNAPPER И ИНТЕГРАЦИЯ С LIMINE (ДЛЯ BTRFS)
-# ------------------------------------------------------------------------------
-echo -e "${INFO} Настройка Snapper и интеграции с загрузчиком Limine..."
-if [ ! -f "/etc/snapper/configs/root" ]; then
-    # Создаем конфигурацию 'root' для точки монтирования '/'
-    sudo snapper -c root create-config /
-    
-    # Разрешаем вашему пользователю управлять снапшотами без sudo
-    sudo snapper -c root chown "$USER"
-    
-    # Настраиваем разумные лимиты хранения снапшотов
-    sudo sed -i 's/TIMELINE_LIMIT_HOURLY=".*"/TIMELINE_LIMIT_HOURLY="5"/' /etc/snapper/configs/root
-    sudo sed -i 's/TIMELINE_LIMIT_DAILY=".*"/TIMELINE_LIMIT_DAILY="7"/' /etc/snapper/configs/root
-    sudo sed -i 's/TIMELINE_LIMIT_WEEKLY=".*"/TIMELINE_LIMIT_WEEKLY="2"/' /etc/snapper/configs/root
-    sudo sed -i 's/TIMELINE_LIMIT_MONTHLY=".*"/TIMELINE_LIMIT_MONTHLY="0"/' /etc/snapper/configs/root
-    sudo sed -i 's/TIMELINE_LIMIT_YEARLY=".*"/TIMELINE_LIMIT_YEARLY="0"/' /etc/snapper/configs/root
-    
-    # Включаем фоновые таймеры автоочистки
-    sudo systemctl enable --now snapper-timeline.timer
-    sudo systemctl enable --now snapper-cleanup.timer
-    
-    # --- НАСТРОЙКА LIMINE ---
-    echo -e "${INFO} Настройка лимитов для Limine (чтобы не переполнять раздел /boot)..."
-    if [ -f "/etc/limine-snapper-sync.conf" ]; then
-        sudo sed -i 's/MAX_SNAPSHOT_ENTRIES=.*$/MAX_SNAPSHOT_ENTRIES=8/' /etc/limine-snapper-sync.conf
-    elif [ -f "/etc/default/limine" ]; then
-        echo "MAX_SNAPSHOT_ENTRIES=8" | sudo tee -a /etc/default/limine > /dev/null
-    fi
-    
-    # Запускаем первую принудительную синхронизацию
-    if command -v limine-snapper-sync &> /dev/null; then
-        sudo limine-snapper-sync || true
-        echo -e "${SUCCESS} Первая синхронизация Limine и Snapper выполнена!"
-    fi
-    
-    echo -e "${SUCCESS} Snapper и Limine успешно сконфигурированы!"
-else
-    echo -e "${INFO} Конфигурация Snapper для root уже существует."
-fi
 
 # ------------------------------------------------------------------------------
 # 9. НАСТРОЙКА FISH SHELL, ПЛАГИНОВ И СМЕНА ОБОЛОЧКИ ПО УМОЛЧАНИЮ

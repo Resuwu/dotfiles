@@ -3,7 +3,7 @@ set -g fish_greeting
 
 # Автозапуск fastfetch при открытии новой интерактивной сессии
 if status is-interactive
-    ff
+    fastfetch
 end
 
 # --- Настройка темы bobthefish ---
